@@ -9,8 +9,6 @@ SELECT
 , DATE("company"."property_term_end") "termend"
 , "company"."property_initial_deal_term" "dealterm"
 , "company"."property_terminated" "terminated"
-, "company"."property_statement_branding" "statementbranding"
-, "company"."property_creative_priority" "creativepriority"
 FROM
   (("hubspot"."company"
 LEFT JOIN "hubspot"."owner" "hso" ON ("company"."property_hubspot_owner_id" = "hso"."owner_id"))
