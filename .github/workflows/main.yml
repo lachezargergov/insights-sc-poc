@@ -6,7 +6,7 @@ on:
       - main
     paths:
       - 'sql/**/*.sql'
-  
+
 jobs:
   run-athena:
     runs-on: ubuntu-latest
@@ -29,28 +29,29 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_REGION: eu-west-1
           ATHENA_DATABASE: insights_sc_poc
-          ATHENA_OUTPUT_LOCATION: s3://your-athena-output-bucket/
+          ATHENA_OUTPUT_LOCATION: s3://aws-athena-query-results-eu-west-1-589126456693/
         run: |
-          BASE_REF="${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}"
-          git fetch origin $BASE_REF
-          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.sha }} -- 'sql/**/*.sql')
+          BASE_REF="HEAD^"
+          CHANGED_FILES=$(git diff --name-only $BASE_REF ${{ github.sha }} -- 'sql/**/*.sql')
           echo "Changed SQL files: $CHANGED_FILES"
           if [ -z "$CHANGED_FILES" ]; then
             echo "No changed SQL files to run."
             exit 0
           fi
-          for sqlfile in $CHANGED_FILES; do
+          echo "$CHANGED_FILES" | while read -r sqlfile; do
+            if [ -z "$sqlfile" ]; then continue; fi
             echo "Running $sqlfile in Athena..."
             python3 -c "
-            import boto3
-            client = boto3.client('athena', region_name='$AWS_REGION')
-            with open('$sqlfile', 'r') as f:
-                query = f.read()
-            response = client.start_query_execution(
-                QueryString=query,
-                QueryExecutionContext={'Database': '$ATHENA_DATABASE'},
-                ResultConfiguration={'OutputLocation': '$ATHENA_OUTPUT_LOCATION'}
-            )
-            print('Started query:', response['QueryExecutionId'])
-            "
-                      done
+          import boto3
+          import os
+          client = boto3.client('athena', region_name=os.environ['AWS_REGION'])
+          with open('$sqlfile', 'r') as f:
+              query = f.read()
+          response = client.start_query_execution(
+              QueryString=query,
+              QueryExecutionContext={'Database': os.environ['ATHENA_DATABASE']},
+              ResultConfiguration={'OutputLocation': os.environ['ATHENA_OUTPUT_LOCATION']}
+          )
+          print('Started query:', response['QueryExecutionId'])
+          "
+                    done
