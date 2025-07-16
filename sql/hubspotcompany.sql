@@ -4,7 +4,6 @@ SELECT
 , "company"."property_nr_client_type" "clienttype_nr"
 , "company"."property_client_type" "clienttier"
 , "company"."property_team_owner" "teamowner"
-, CONCAT("hso"."first_name", ' ', "hso"."last_name") "companyowner"
 , "company"."property_service_level" "servicelevel"
 , "company"."property_genre" "genre"
 , DATE("company"."property_start_date") "contractstartdate"
