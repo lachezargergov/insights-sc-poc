@@ -7,7 +7,6 @@ SELECT
 , DATE("company"."property_start_date") "contractstartdate"
 , DATE("company"."property_last_renewal_date") "lastrenewaldate"
 , "company"."property_terminated" "terminated"
-, "company"."property_creative_priority" "creativepriority"
 FROM
   (("hubspot"."company"
 LEFT JOIN "hubspot"."owner" "hso" ON ("company"."property_hubspot_owner_id" = "hso"."owner_id"))
