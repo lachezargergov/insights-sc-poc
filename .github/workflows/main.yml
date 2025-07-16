@@ -31,11 +31,7 @@ jobs:
           ATHENA_DATABASE: insights_sc_poc
           ATHENA_OUTPUT_LOCATION: s3://your-athena-output-bucket/
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
-          BASE_REF=${{ github.base_ref }}
-          else
-            BASE_REF=main
-          fi
+          BASE_REF="${{ github.event_name == 'pull_request' && github.base_ref || 'main' }}"
           git fetch origin $BASE_REF
           CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.sha }} -- 'sql/**/*.sql')
           echo "Changed SQL files: $CHANGED_FILES"
