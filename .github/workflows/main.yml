@@ -1,0 +1,56 @@
+name: Run Athena Queries on Changed Files
+
+on:
+  push:
+    paths:
+      - 'sql/**/*.sql'
+  pull_request:
+    paths:
+      - 'sql/**/*.sql'
+
+jobs:
+  run-athena:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+
+      - name: Install boto3
+        run: pip install boto3
+
+      - name: Run changed SQL queries on Athena
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_REGION: eu-west-1
+          ATHENA_DATABASE: insights_sc_poc
+          ATHENA_OUTPUT_LOCATION: s3://your-athena-output-bucket/
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          CHANGED_FILES=$(git diff --name-only origin/${{ github.base_ref }} ${{ github.sha }} -- 'sql/**/*.sql')
+          echo "Changed SQL files: $CHANGED_FILES"
+          if [ -z "$CHANGED_FILES" ]; then
+            echo "No changed SQL files to run."
+            exit 0
+          fi
+          for sqlfile in $CHANGED_FILES; do
+            echo "Running $sqlfile in Athena..."
+            python3 -c "
+import boto3
+client = boto3.client('athena', region_name='$AWS_REGION')
+with open('$sqlfile', 'r') as f:
+    query = f.read()
+response = client.start_query_execution(
+    QueryString=query,
+    QueryExecutionContext={'Database': '$ATHENA_DATABASE'},
+    ResultConfiguration={'OutputLocation': '$ATHENA_OUTPUT_LOCATION'}
+)
+print('Started query:', response['QueryExecutionId'])
+"
+          done
