@@ -42,15 +42,15 @@ jobs:
           for sqlfile in $CHANGED_FILES; do
             echo "Running $sqlfile in Athena..."
             python3 -c "
-import boto3
-client = boto3.client('athena', region_name='$AWS_REGION')
-with open('$sqlfile', 'r') as f:
-    query = f.read()
-response = client.start_query_execution(
-    QueryString=query,
-    QueryExecutionContext={'Database': '$ATHENA_DATABASE'},
-    ResultConfiguration={'OutputLocation': '$ATHENA_OUTPUT_LOCATION'}
-)
-print('Started query:', response['QueryExecutionId'])
-"
-          done
+            import boto3
+            client = boto3.client('athena', region_name='$AWS_REGION')
+            with open('$sqlfile', 'r') as f:
+                query = f.read()
+            response = client.start_query_execution(
+                QueryString=query,
+                QueryExecutionContext={'Database': '$ATHENA_DATABASE'},
+                ResultConfiguration={'OutputLocation': '$ATHENA_OUTPUT_LOCATION'}
+            )
+            print('Started query:', response['QueryExecutionId'])
+            "
+                      done
