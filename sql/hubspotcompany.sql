@@ -10,7 +10,6 @@ SELECT
 , "company"."property_genre" "genre"
 , DATE("company"."property_start_date") "contractstartdate"
 , DATE("company"."property_last_renewal_date") "lastrenewaldate"
-, DATE("company"."property_term_end") "termend"
 , "company"."property_initial_deal_term" "dealterm"
 , "company"."property_terminated" "terminated"
 , "company"."property_creative_priority" "creativepriority"
