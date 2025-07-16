@@ -1,7 +1,6 @@
 CREATE OR REPLACE VIEW "hubspotcompany" AS 
 SELECT
   "company"."id" "companyid"
-
 , "company"."property_nr_client_type" "clienttype_nr"
 , "company"."property_client_type" "clienttier"
 , "company"."property_team_owner" "teamowner"
