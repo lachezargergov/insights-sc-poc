@@ -6,10 +6,7 @@ on:
       - main
     paths:
       - 'sql/**/*.sql'
-  pull_request:
-    paths:
-      - 'sql/**/*.sql'
-
+  
 jobs:
   run-athena:
     runs-on: ubuntu-latest
