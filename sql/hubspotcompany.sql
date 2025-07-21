@@ -3,8 +3,6 @@ SELECT
   "company"."id" "companyid"
 , "company"."property_nr_client_type" "clienttype_nr"
 , "company"."property_client_type" "clienttier"
-, "company"."property_service_level" "servicelevel"
-, "company"."property_genre" "genre"
 , DATE("company"."property_start_date") "contractstartdate"
 , DATE("company"."property_last_renewal_date") "lastrenewaldate"
 , "company"."property_terminated" "terminated"
